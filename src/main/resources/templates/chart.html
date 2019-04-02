@@ -28,11 +28,11 @@
 						</div>
 					</div>
 					<div class="row" style="margin-bottom: 30px">
-						<div class="col-md-6" style="margin-top: 20px">
+						<!-- <div class="col-md-6" style="margin-top: 20px">
 							<div id="salesByType" style="width: 100%; height: 400px;"></div>
-						</div>
+						</div> -->
 						<div class="col-md-6" style="margin-top: 20px">
-							<div id="salesByRegion" style="width: 100%; height: 400px;"></div>
+							<div id="pieChartMetrics" style="width: 100%; height: 400px;"></div>
 						</div>
 					</div>
 				</div>
@@ -42,6 +42,8 @@
 	<div th:include="fragments/homefooter :: footer"></div>
 	<script th:inline="javascript">
 		/*<![CDATA[*/
+		var pieData = /*[[${pieData}]]*/;
+		
 		$(function() {
 			Highcharts.setOptions({
 				lang : {
@@ -49,13 +51,25 @@
 					thousandsSep : ','
 				}
 			});
-
-			drawSalesByTypeChart();
-			drawSalesByRegionChart();
+			
+			//drawSalesByTypeChart();
+			drawPieChartMetricsChart();
 		});
 
-		function drawSalesByRegionChart() {
-            var salesByRegionChart = Highcharts.chart('salesByRegion', {
+		function userAction(componentName) {
+		    var xhttp = new XMLHttpRequest();
+		    xhttp.onreadystatechange = function() {
+		         if (this.readyState == 4 && this.status == 200) {
+		        	 pieData = this.responseText;
+		         }
+		    };
+		    xhttp.open("GET", "/getPieChartData/" + componentName);
+		    //xhttp.setRequestHeader("Content-type", "application/json");
+		    xhttp.send();
+		}
+		
+		function drawPieChartMetricsChart() {
+            var pieChartMetricsChart = Highcharts.chart('pieChartMetrics', {
                 chart: {
                     type: 'pie',
                     margin: 40,
@@ -66,39 +80,47 @@
                     }
                 },
                 title: {
-                    text: 'Sales by Region'
+                    text: 'Average Build Time (in milliseconds)'
                 },
                 tooltip: {
-                  	pointFormat: "${point.y:,.0f}"
-                },
-                plotOptions: {
-                	pie: {
-                		allowPointSelect: true,
-                		depth: 35
-                	}
+                  	pointFormat: "{point.y:,.0f}"
                 },
                 series: [{
-                    name: 'Regions',
+                    name: 'PieChartSeries',
                     colorByPoint:true,
-                    data: (function () {
-                        var data = [], i;
-                        var dataString = /*[[${pieData}]]*/;
-                        var dataJson = JSON.parse(dataString);
-                        var dataArray = dataJson.data;
-                        for (i = 0; i < dataArray.length; i++) {
-                        	var dataElement = {
-                        			name: dataArray[i].name,
-                                    y: dataArray[i].y
-                        	};
-                            data.push(dataElement);
+                    point:{
+                        events:{
+                            click: function (event) {
+                                //alert(this.x + " " + this.y);
+                                userAction(event.point.name);
+                                var chart2 = $('#pieChartMetrics').highcharts();
+                                chart2.series[0].setData(createData());
+                                chart2.redraw();
+                            }
                         }
-                        return data;
+                    },   
+                    data: (function () {
+                       return createData();
                     }())
                     
             	}]
             });
         }
 
+		function createData() {
+			var data = [], i;
+			var dataString = pieData;
+            var dataJson = JSON.parse(dataString);
+            var dataArray = dataJson.data;
+            for (i = 0; i < dataArray.length; i++) {
+            	var dataElement = {
+            			name: dataArray[i].name,
+                        y: dataArray[i].y
+            	};
+                data.push(dataElement);
+            }
+            return data;
+		}
 		function drawSalesByTypeChart() {
 			var salesByTypeChart = Highcharts.chart('salesByType', {
 				chart : {
