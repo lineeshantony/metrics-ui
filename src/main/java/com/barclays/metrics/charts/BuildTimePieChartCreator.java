@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 public class BuildTimePieChartCreator {
 
-	public JSONObject getPieData(String projectName) throws JSONException {
+	public JSONObject getData(String projectName) throws JSONException {
 		boolean apiCall = false;
 		if (!apiCall) {
 			return getDataFromStaticinfo(projectName);

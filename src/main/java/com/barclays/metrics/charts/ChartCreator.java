@@ -7,11 +7,14 @@ public class ChartCreator {
 	public JSONObject getData(String projectName, int metricsType) throws JSONException {
 		if (metricsType == 1) {
 			BuildTimePieChartCreator buildTimePieChartCreator = new BuildTimePieChartCreator();
-			return buildTimePieChartCreator.getPieData(projectName);
+			return buildTimePieChartCreator.getData(projectName);
 		} else if (metricsType == 2) {
 			CommitFrequencyPieChartCreator commitFrequencyPieChartCreator = new CommitFrequencyPieChartCreator();
-			return commitFrequencyPieChartCreator.getPieData(projectName);
+			return commitFrequencyPieChartCreator.getData(projectName);
+		} else if (metricsType == 3) {
+			CommitFrequencyTrendComparisonChartCreator commitFrequencyTrendPieChartCreator = new CommitFrequencyTrendComparisonChartCreator();
+			return commitFrequencyTrendPieChartCreator.getData(projectName);
 		}
-		return null;
+		return new JSONObject();
 	}
 }

@@ -26,7 +26,6 @@ public class ChartsController {
 
 	@RequestMapping(value = "/chart", method = RequestMethod.GET)
 	public String chart(Model model) throws JSONException {
-		System.out.println("inside chart");
 		model.addAttribute("chartData", new ChartCreator().getData("All", 1).toString());
 		model.addAttribute("metricsFilter", metricsFilter);
 		List<Integer> clCodecoverage = Arrays.asList(4074, 3455, 4112);
@@ -41,14 +40,11 @@ public class ChartsController {
 	}
 	
     @PostMapping("/metricsFilter")
-    public String metricaFilterSubmit(Model model, @ModelAttribute MetricsFilter metricsFilter) throws JSONException {
+    public String metricsFilterSubmit(Model model, @ModelAttribute MetricsFilter metricsFilter) throws JSONException {
     	this.metricsFilter = metricsFilter;
     	model.addAttribute("chartData", 
     			new ChartCreator().getData(getSegmentName(metricsFilter), metricsFilter.getMetricsType()).toString());
 		model.addAttribute("metricsFilter", metricsFilter);
-    	System.out.println("inside metricaFilterSubmit");
-    	System.out.println("getBusinessUnit: " + this.metricsFilter.getBusinessUnit());
-    	System.out.println("getMetricsType: " + this.metricsFilter.getMetricsType());
         return "chart";
     }
 

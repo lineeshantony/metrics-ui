@@ -37,8 +37,7 @@
 								<p>
 									<select id="metricTypeSelector" th:field="*{metricsType}">
 										<option th:each="metricType : ${metricTypes}"
-											th:value="${metricType.id}"
-											th:utext="${metricType.type}" /></option>
+											th:value="${metricType.id}" th:utext="${metricType.type}" /></option>
 									</select>
 								</p>
 								<p>
@@ -57,7 +56,7 @@
 							<div id="salesByType" style="width: 100%; height: 400px;"></div>
 						</div> -->
 						<div class="col-md-6" style="margin-top: 20px">
-							<div id="pieChartMetrics" style="width: 100%; height: 400px;"></div>
+							<div id="chartMetrics" style="width: 100%; height: 400px;"></div>
 						</div>
 					</div>
 				</div>
@@ -67,7 +66,8 @@
 	<div th:include="fragments/homefooter :: footer"></div>
 	<script th:inline="javascript">
 		/*<![CDATA[*/
-		var chartData = /*[[${chartData}]]*/;
+		var chartDataString = /*[[${chartData}]]*/;
+		var chartData = JSON.parse(chartDataString);
 		var metricTypeSelect = document.getElementById("metricTypeSelector");
 		var selectedMetricType = metricTypeSelect.options[metricTypeSelect.selectedIndex].value;
 		$(function() {
@@ -79,14 +79,19 @@
 			});
 			
 			//drawSalesByTypeChart();
-			drawPieChartMetricsChart();
+			if (selectedMetricType == 3 || selectedMetricType == "3"){
+				drawTrendChartComparison();
+			} else {
+				drawPieChartMetricsChart();
+			}
+			
 		});
 
 		function userAction(componentName) {
 		    var xhttp = new XMLHttpRequest();
 		    xhttp.onreadystatechange = function() {
 		         if (this.readyState == 4 && this.status == 200) {
-		        	 chartData = this.responseText;
+		        	 chartData = JSON.parse(this.responseText);
 		         }
 		    };
 		    xhttp.open("GET", "/getPieChartData/" + componentName + "/" + selectedMetricType);
@@ -95,7 +100,7 @@
 		}
 		
 		function drawPieChartMetricsChart() {
-            var pieChartMetricsChart = Highcharts.chart('pieChartMetrics', {
+            var pieChartMetricsChart = Highcharts.chart('chartMetrics', {
                 chart: {
                     type: 'pie',
                     margin: 40,
@@ -119,7 +124,7 @@
                             click: function (event) {
                                 //alert(this.x + " " + this.y);
                                 userAction(event.point.name);
-                                var chart2 = $('#pieChartMetrics').highcharts();
+                                var chart2 = $('#chartMetrics').highcharts();
                                 chart2.series[0].setData(createData());
                                 chart2.redraw();
                             }
@@ -135,8 +140,7 @@
 
 		function createData() {
 			var data = [], i;
-			var dataString = chartData;
-            var dataJson = JSON.parse(dataString);
+			var dataJson = chartData;
             var dataArray = dataJson.data;
             for (i = 0; i < dataArray.length; i++) {
             	var dataElement = {
@@ -147,6 +151,57 @@
             }
             return data;
 		}
+		
+		function drawTrendChartComparison(){
+			var trendComparisonChart = Highcharts.chart('chartMetrics', {
+
+			    title: {
+			        text: 'Commit Frequency, Year 2018'
+			    },
+
+			    yAxis: {
+			        title: {
+			            text: 'Number of Commits'
+			        }
+			    },
+			    legend: {
+			        layout: 'vertical',
+			        align: 'right',
+			        verticalAlign: 'middle'
+			    },
+
+			    plotOptions: {
+			        series: {
+			            label: {
+			                connectorAllowed: false
+			            }
+			        }
+			    },
+
+			    xAxis: {
+			        categories: chartData.categories
+			    },
+			    
+			    series: chartData.dataArray,
+
+			    responsive: {
+			        rules: [{
+			            condition: {
+			                maxWidth: 500
+			            },
+			            chartOptions: {
+			                legend: {
+			                    layout: 'horizontal',
+			                    align: 'center',
+			                    verticalAlign: 'bottom'
+			                }
+			            }
+			        }]
+			    }
+
+			});
+		}
+		
 		function drawSalesByTypeChart() {
 			var salesByTypeChart = Highcharts.chart('salesByType', {
 				chart : {
