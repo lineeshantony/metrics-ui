@@ -38,7 +38,7 @@ public class PieChartCreator {
 			return getCardNGPieData();
 		} else if ("BAPI".equals(projectName)) {
 			return getBapiPieData();
-		} else if ("all".equals(projectName)) {
+		} else if ("All".equals(projectName)) {
 			return getAllBuildTimeData();
 		}
 		return new JSONObject();

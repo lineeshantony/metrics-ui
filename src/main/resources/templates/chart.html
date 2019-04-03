@@ -18,6 +18,7 @@
 	type="text/css" />
 </head>
 
+
 <body class="page-container-bg-solid">
 	<div class="page-container main">
 		<div class="page-content-wrapper">
@@ -31,17 +32,24 @@
 					</div>
 					<div class="row" style="margin-bottom: 30px">
 						<div class="sidenav">
-							<form action="#" th:action="@{/metricsFilter}" th:object="${metricsFilter}"
-								method="post">
+							<form action="#" th:action="@{/metricsFilter}"
+								th:object="${metricsFilter}" method="post">
 								<p>
-									Metrics Type: <input type="text" th:field="*{metricsType}" />
+									<select th:field="*{metricsType}">
+										<option th:each="metricType : ${metricTypes}"
+											th:value="${metricType.id}"
+											th:utext="${metricType.type}" /></option>
+									</select>
 								</p>
 								<p>
-									Business Unit: <input type="text" th:field="*{businessUnit}" />
+									<select th:field="*{businessUnit}">
+										<option th:each="businessUnit : ${allSegments}"
+											th:value="${businessUnit.value}"
+											th:utext="${businessUnit.name}" /></option>
+									</select>
 								</p>
 								<p>
-									<input type="submit" value="Submit" /> <input type="reset"
-										value="Reset" />
+									<input type="submit" value="Submit" />
 								</p>
 							</form>
 						</div>

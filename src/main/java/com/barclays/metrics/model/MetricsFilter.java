@@ -2,22 +2,22 @@ package com.barclays.metrics.model;
 
 public class MetricsFilter {
 
-	private String metricsType;
-	private String businessUnit;
+	private int metricsType;
+	private int businessUnit;
 
-	public String getBusinessUnit() {
+	public int getBusinessUnit() {
 		return businessUnit;
 	}
 
-	public void setBusinessUnit(String businessUnit) {
+	public void setBusinessUnit(int businessUnit) {
 		this.businessUnit = businessUnit;
 	}
 
-	public String getMetricsType() {
+	public int getMetricsType() {
 		return metricsType;
 	}
 
-	public void setMetricsType(String metricsType) {
+	public void setMetricsType(int metricsType) {
 		this.metricsType = metricsType;
 	}
 
