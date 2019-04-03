@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PieChartCreator {
+public class BuildTimePieChartCreator {
 
 	public JSONObject getPieData(String projectName) throws JSONException {
 		boolean apiCall = false;

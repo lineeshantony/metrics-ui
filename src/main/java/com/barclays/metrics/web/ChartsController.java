@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.barclays.metrics.charts.PieChartCreator;
+import com.barclays.metrics.charts.ChartCreator;
 import com.barclays.metrics.model.MetricsFilter;
 import com.barclays.metrics.model.MetricsVO;
 import com.barclays.metrics.model.Segment;
@@ -27,7 +27,7 @@ public class ChartsController {
 	@RequestMapping(value = "/chart", method = RequestMethod.GET)
 	public String chart(Model model) throws JSONException {
 		System.out.println("inside chart");
-		model.addAttribute("pieData", new PieChartCreator().getPieData("all").toString());
+		model.addAttribute("chartData", new ChartCreator().getData("All", 1).toString());
 		model.addAttribute("metricsFilter", metricsFilter);
 		List<Integer> clCodecoverage = Arrays.asList(4074, 3455, 4112);
 		List<Integer> bapiCodecoverage = Arrays.asList(3222, 3011, 3788);
@@ -43,8 +43,8 @@ public class ChartsController {
     @PostMapping("/metricsFilter")
     public String metricaFilterSubmit(Model model, @ModelAttribute MetricsFilter metricsFilter) throws JSONException {
     	this.metricsFilter = metricsFilter;
-    	model.addAttribute("pieData", 
-    			new PieChartCreator().getPieData(getSegmentName(metricsFilter)).toString());
+    	model.addAttribute("chartData", 
+    			new ChartCreator().getData(getSegmentName(metricsFilter), metricsFilter.getMetricsType()).toString());
 		model.addAttribute("metricsFilter", metricsFilter);
     	System.out.println("inside metricaFilterSubmit");
     	System.out.println("getBusinessUnit: " + this.metricsFilter.getBusinessUnit());
@@ -62,7 +62,7 @@ public class ChartsController {
         ArrayList<MetricsVO> metricTypes = new ArrayList<MetricsVO>();
         metricTypes.add(new MetricsVO(1,  "Build Time"));
         metricTypes.add(new MetricsVO(2,  "Commit Frequency"));
-        metricTypes.add(new MetricsVO(2,  "Commit Frequency Trend"));
+        metricTypes.add(new MetricsVO(3,  "Commit Frequency Trend"));
         return metricTypes;
     }
     

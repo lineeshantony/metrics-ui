@@ -35,7 +35,7 @@
 							<form action="#" th:action="@{/metricsFilter}"
 								th:object="${metricsFilter}" method="post">
 								<p>
-									<select th:field="*{metricsType}">
+									<select id="metricTypeSelector" th:field="*{metricsType}">
 										<option th:each="metricType : ${metricTypes}"
 											th:value="${metricType.id}"
 											th:utext="${metricType.type}" /></option>
@@ -67,8 +67,9 @@
 	<div th:include="fragments/homefooter :: footer"></div>
 	<script th:inline="javascript">
 		/*<![CDATA[*/
-		var pieData = /*[[${pieData}]]*/;
-		
+		var chartData = /*[[${chartData}]]*/;
+		var metricTypeSelect = document.getElementById("metricTypeSelector");
+		var selectedMetricType = metricTypeSelect.options[metricTypeSelect.selectedIndex].value;
 		$(function() {
 			Highcharts.setOptions({
 				lang : {
@@ -85,10 +86,10 @@
 		    var xhttp = new XMLHttpRequest();
 		    xhttp.onreadystatechange = function() {
 		         if (this.readyState == 4 && this.status == 200) {
-		        	 pieData = this.responseText;
+		        	 chartData = this.responseText;
 		         }
 		    };
-		    xhttp.open("GET", "/getPieChartData/" + componentName);
+		    xhttp.open("GET", "/getPieChartData/" + componentName + "/" + selectedMetricType);
 		    //xhttp.setRequestHeader("Content-type", "application/json");
 		    xhttp.send();
 		}
@@ -134,7 +135,7 @@
 
 		function createData() {
 			var data = [], i;
-			var dataString = pieData;
+			var dataString = chartData;
             var dataJson = JSON.parse(dataString);
             var dataArray = dataJson.data;
             for (i = 0; i < dataArray.length; i++) {
