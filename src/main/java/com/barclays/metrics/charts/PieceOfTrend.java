@@ -8,7 +8,6 @@ public class PieceOfTrend {
 	private List<Integer> trendValues;
 	
 	public PieceOfTrend(String name, List<Integer> trendValues) {
-		super();
 		this.name = name;
 		this.trendValues = trendValues;
 	}
