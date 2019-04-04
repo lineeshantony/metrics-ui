@@ -69,6 +69,7 @@
 		var chartDataString = /*[[${chartData}]]*/;
 		var chartData = JSON.parse(chartDataString);
 		var metricTypeSelect = document.getElementById("metricTypeSelector");
+		var title = "";
 		var selectedMetricType = metricTypeSelect.options[metricTypeSelect.selectedIndex].value;
 		$(function() {
 			Highcharts.setOptions({
@@ -80,8 +81,13 @@
 			
 			//drawSalesByTypeChart();
 			if (selectedMetricType == 3 || selectedMetricType == "3"){
+				title = "Commit Frequency Trend Comparison"
 				drawTrendChartComparison();
+			} else if (selectedMetricType == 2 || selectedMetricType == "2") {
+				title = "Commit Frequency"
+				drawPieChartMetricsChart();
 			} else {
+				title = "Average Build Time (in milliseconds)"
 				drawPieChartMetricsChart();
 			}
 			
@@ -111,7 +117,7 @@
                     }
                 },
                 title: {
-                    text: 'Average Build Time (in milliseconds)'
+                    text: title
                 },
                 tooltip: {
                   	pointFormat: "{point.y:,.0f}"
@@ -156,7 +162,7 @@
 			var trendComparisonChart = Highcharts.chart('chartMetrics', {
 
 			    title: {
-			        text: 'Commit Frequency, Year 2018'
+			        text: title
 			    },
 
 			    yAxis: {
