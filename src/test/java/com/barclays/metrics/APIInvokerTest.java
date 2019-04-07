@@ -9,7 +9,7 @@ import com.barclays.metrics.web.APIInvoker;
 
 public class APIInvokerTest {
 	
-	@Test
+	//@Test
 	public void test_callAPI() throws ClientProtocolException, IOException{
 		APIInvoker apiInvoker = new APIInvoker();
 		apiInvoker.callAPI();

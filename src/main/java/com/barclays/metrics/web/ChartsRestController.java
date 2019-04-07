@@ -13,8 +13,11 @@ public class ChartsRestController {
 
 	@RequestMapping(value = "/getPieChartData/{componentName}/{selectedMetricType}", method = RequestMethod.GET)
 	public String getPieChartData(@PathVariable(value = "componentName") String componentName,
-			@PathVariable(value = "selectedMetricType") int selectedMetricType) throws JSONException {
-		return new ChartCreator().getData(componentName, selectedMetricType).toString();
+			@PathVariable(value = "selectedMetricType") String selectedMetricType) throws JSONException {
+		System.out.println("componentName: " + componentName);
+		System.out.println("selectedMetricType: " + selectedMetricType);
+		//return new ChartCreator().getData(componentName, selectedMetricType).toString();
+		return "";
 	}
 
 }

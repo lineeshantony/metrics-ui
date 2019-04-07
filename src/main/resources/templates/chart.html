@@ -19,6 +19,83 @@
 </head>
 
 
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	window.onload=function() {
+		document.getElementById("geographyDropdown").style.display = 'none';
+		document.getElementById("geographyDropdownLabel").style.display = 'none';
+		
+		document.getElementById("projectDropdown").style.display = 'none';
+		document.getElementById("projectDropdownLabel").style.display = 'none';
+		
+		document.getElementById("repoDropdown").style.display = 'none';
+		document.getElementById("repoDropdownLabel").style.display = 'none';
+	}
+	var segmentMapString = /*[[${segmentMap}]]*/;
+	var segmentMap = JSON.parse(segmentMapString);
+	function onTransactionCycleChange() {
+		var transactionCycleDropdown = document.getElementById('transactionCycleDropdown');
+        var geographyDropdown = document.getElementById("geographyDropdown");
+        var transactionCycleSelectedValue = transactionCycleDropdown.options[transactionCycleDropdown.selectedIndex].value;
+        if (transactionCycleSelectedValue == "all") {
+        	document.getElementById("geographyDropdown").style.display = 'none';
+    		document.getElementById("geographyDropdownLabel").style.display = 'none';
+    		
+    		document.getElementById("projectDropdown").style.display = 'none';
+    		document.getElementById("projectDropdownLabel").style.display = 'none';
+    		
+    		document.getElementById("repoDropdown").style.display = 'none';
+    		document.getElementById("repoDropdownLabel").style.display = 'none';
+        } else {
+     	   processDropdowns(geographyDropdown, transactionCycleSelectedValue, "geographyDropdownLabel");
+        }
+	}
+	
+	function onGeographyChange() {
+		var geographyDropdown = document.getElementById("geographyDropdown");
+        var projectDropdown = document.getElementById("projectDropdown");
+        var geographySelectedValue = geographyDropdown.options[geographyDropdown.selectedIndex].value;
+        if (geographySelectedValue == "all") {
+    		document.getElementById("projectDropdown").style.display = 'none';
+    		document.getElementById("projectDropdownLabel").style.display = 'none';
+    		
+    		document.getElementById("repoDropdown").style.display = 'none';
+    		document.getElementById("repoDropdownLabel").style.display = 'none';
+        } else {
+     	   processDropdowns(projectDropdown, geographySelectedValue, "projectDropdownLabel");
+        }
+	}
+	
+	function onProjectChange() {
+		var projectDropdown = document.getElementById("projectDropdown");
+        var repoDropdown = document.getElementById("repoDropdown");
+        var projectSelectedValue = projectDropdown.options[projectDropdown.selectedIndex].value;
+        if (projectSelectedValue == "all") {
+    		document.getElementById("repoDropdown").style.display = 'none';
+    		document.getElementById("repoDropdownLabel").style.display = 'none';
+        } else {
+     	   processDropdowns(repoDropdown, projectSelectedValue, "repoDropdownLabel");
+        }
+	}
+	
+	function processDropdowns(childDropdown, selectedValue, childDropdownLabel) {
+	   childDropdown.style.display = 'block';
+	   document.getElementById(childDropdownLabel).style.display = 'block';
+   	   if (childDropdown.length > 0) {
+    	   for (var i = 1; i<childDropdown.length; i++) {
+       		   childDropdown.remove(i);
+       	   }
+       }
+       var childDropdownValues = segmentMap[selectedValue];
+   	   for (var i = 0; i < childDropdownValues.length; i++) {
+   		  var option = document.createElement("option");
+   		  option.textContent = childDropdownValues[i].segmentName;
+   		  option.value = childDropdownValues[i].segmentKey;
+   		  childDropdown.appendChild(option);
+  	   }
+	}
+	/*]]>*/
+</script>
 <body class="page-container-bg-solid">
 	<div class="page-container main">
 		<div class="page-content-wrapper">
@@ -34,17 +111,42 @@
 						<div class="sidenav">
 							<form action="#" th:action="@{/metricsFilter}"
 								th:object="${metricsFilter}" method="post">
+								<p>Metrics Type</p>
 								<p>
 									<select id="metricTypeSelector" th:field="*{metricsType}">
 										<option th:each="metricType : ${metricTypes}"
-											th:value="${metricType.id}" th:utext="${metricType.type}" /></option>
+											th:value="${metricType.key}" th:utext="${metricType.type}" /></option>
 									</select>
 								</p>
+								<p>Transaction Cycle</p>
 								<p>
-									<select th:field="*{businessUnit}">
-										<option th:each="businessUnit : ${allSegments}"
-											th:value="${businessUnit.value}"
-											th:utext="${businessUnit.name}" /></option>
+									<select id="transactionCycleDropdown"
+										th:field="*{transactionCycle}"
+										onchange="onTransactionCycleChange()">
+										<option th:value="all" th:utext="All" />
+										<option th:each="transactionCycle : ${tcSegments}"
+											th:value="${transactionCycle.segmentKey}"
+											th:utext="${transactionCycle.segmentName}" /></option>
+									</select>
+								</p>
+								<p id="geographyDropdownLabel">Geography</p>
+								<p>
+									<select id="geographyDropdown" th:field="*{geography}"
+										onchange="onGeographyChange()">
+										<option th:value="all" th:utext="All" />
+									</select>
+								</p>
+								<p id="projectDropdownLabel">Project</p>
+								<p>
+									<select id="projectDropdown" th:field="*{project}"
+										onchange="onProjectChange()">
+										<option th:value="all" th:utext="All" />
+									</select>
+								</p>
+								<p id="repoDropdownLabel">Repo</p>
+								<p>
+									<select id="repoDropdown" th:field="*{repo}">
+										<option th:value="all" th:utext="All" />
 									</select>
 								</p>
 								<p>
@@ -71,6 +173,7 @@
 		var metricTypeSelect = document.getElementById("metricTypeSelector");
 		var title = "";
 		var selectedMetricType = metricTypeSelect.options[metricTypeSelect.selectedIndex].value;
+		
 		$(function() {
 			Highcharts.setOptions({
 				lang : {
@@ -80,10 +183,10 @@
 			});
 			
 			//drawSalesByTypeChart();
-			if (selectedMetricType == 3 || selectedMetricType == "3"){
+			if (selectedMetricType == "commit-frequency-trend-comparison"){
 				title = "Commit Frequency Trend Comparison"
 				drawTrendChartComparison();
-			} else if (selectedMetricType == 2 || selectedMetricType == "2") {
+			} else if (selectedMetricType == "commit-frequency") {
 				title = "Commit Frequency"
 				drawPieChartMetricsChart();
 			} else {
