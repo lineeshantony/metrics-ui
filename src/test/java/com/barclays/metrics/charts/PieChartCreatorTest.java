@@ -7,7 +7,7 @@ public class PieChartCreatorTest {
 
 	@Test
 	public void test_getChart() throws JSONException{
-		BuildTimePieChartCreator pieChartCreator = new BuildTimePieChartCreator();
+		BuildTimePieChartCreator pieChartCreator = new BuildTimePieChartCreator("");
 		//pieChartCreator.getChart();
 	}
 }

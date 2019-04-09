@@ -1,9 +1,11 @@
 package com.barclays.metrics.web;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,13 +31,12 @@ public class ChartsController {
 	private SegmentDataCollector segmentDataCollector;
 
 	@RequestMapping(value = "/chart", method = RequestMethod.GET)
-	public String chart(Model model) throws JSONException {
+	public String chart(Model model) throws JSONException, ClientProtocolException, IOException {
 		metricsFilter.setMetricsType("build-duration");
-		metricsFilter.setTransactionCycle("All");
+		metricsFilter.setTransactionCycle("all");
 		model.addAttribute("chartData", new ChartCreator().getData(metricsFilter).toString());
 		model.addAttribute("metricsFilter", metricsFilter);
-		Gson gson = new Gson(); 
-		model.addAttribute("segmentMap", gson.toJson(segmentDataCollector.getOrCreateSegmentMap()));
+		model.addAttribute("segmentMap", new Gson().toJson(segmentDataCollector.getOrCreateSegmentMap()));
 
 		List<Integer> clCodecoverage = Arrays.asList(4074, 3455, 4112);
 		List<Integer> bapiCodecoverage = Arrays.asList(3222, 3011, 3788);
@@ -49,12 +50,13 @@ public class ChartsController {
 	}
 
 	@PostMapping("/metricsFilter")
-	public String metricsFilterSubmit(Model model, @ModelAttribute MetricsFilter metricsFilter) throws JSONException {
+	public String metricsFilterSubmit(Model model, @ModelAttribute MetricsFilter metricsFilter) throws JSONException, ClientProtocolException, IOException {
 		this.metricsFilter = metricsFilter;
 		System.out.println(metricsFilter);
 		model.addAttribute("chartData",
-				new ChartCreator().getData(metricsFilter));
+				new ChartCreator().getData(metricsFilter).toString());
 		model.addAttribute("metricsFilter", metricsFilter);
+		model.addAttribute("segmentMap", new Gson().toJson(segmentDataCollector.getOrCreateSegmentMap()));
 		return "chart";
 	}
 

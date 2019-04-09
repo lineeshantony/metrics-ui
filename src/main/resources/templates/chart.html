@@ -111,6 +111,10 @@
 						<div class="sidenav">
 							<form action="#" th:action="@{/metricsFilter}"
 								th:object="${metricsFilter}" method="post">
+								<input type="hidden" id="tcHiddenId" th:value="${metricsFilter.transactionCycle}" />
+								<input type="hidden" id="geographyHiddenId" th:value="${metricsFilter.geography}" />
+								<input type="hidden" id="projectHiddenId" th:value="${metricsFilter.project}" />
+								<input type="hidden" id="repoHiddenId" th:value="${metricsFilter.repo}" />
 								<p>Metrics Type</p>
 								<p>
 									<select id="metricTypeSelector" th:field="*{metricsType}">
@@ -197,15 +201,52 @@
 		});
 
 		function userAction(componentName) {
+			var tcInputField = document.getElementById("tcHiddenId");
+			var geographyInputField = document.getElementById("geographyHiddenId");
+			var projectInputField = document.getElementById("projectHiddenId");
+			var repoInputField = document.getElementById("repoHiddenId");
+			
+			var tcValue = getPlaceHolderForEmptyOrNull(tcInputField.value);
+			var geographyValue = getPlaceHolderForEmptyOrNull(geographyInputField.value);
+			var projectValue = getPlaceHolderForEmptyOrNull(projectInputField.value);
+			var repoValue = getPlaceHolderForEmptyOrNull(repoInputField.value);
+			if (tcValue != componentName 
+					&& geographyValue != componentName 
+					&& projectValue != componentName
+					&& repoValue != componentName) {
+				if (tcValue=="all") {
+					tcInputField.value = componentName;
+					tcValue = componentName;
+				} else if (geographyValue=="all") {
+					geographyInputField.value = componentName;
+					geographyValue = componentName;
+				} else if (projectValue=="all") {
+					projectInputField.value = componentName;
+					projectValue = componentName;
+				} else if (repoValue=="all") {
+					repoInputField.value = componentName;
+					repoValue = componentName;
+				}
+			}
 		    var xhttp = new XMLHttpRequest();
 		    xhttp.onreadystatechange = function() {
 		         if (this.readyState == 4 && this.status == 200) {
 		        	 chartData = JSON.parse(this.responseText);
 		         }
 		    };
-		    xhttp.open("GET", "/getPieChartData/" + componentName + "/" + selectedMetricType);
-		    //xhttp.setRequestHeader("Content-type", "application/json");
+		    xhttp.open("GET", "/getPieChartData/" + selectedMetricType 
+		    		+ "/" + tcValue 
+		    		+ "/" + geographyValue 
+		    		+ "/" + projectValue 
+		    		+ "/" + repoValue);
 		    xhttp.send();
+		}
+		
+		function getPlaceHolderForEmptyOrNull(input){
+			if (input==null || input=="" || input===""){
+				return "all";
+			}
+			return input;
 		}
 		
 		function drawPieChartMetricsChart() {

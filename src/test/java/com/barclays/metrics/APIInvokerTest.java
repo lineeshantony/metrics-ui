@@ -12,7 +12,7 @@ public class APIInvokerTest {
 	//@Test
 	public void test_callAPI() throws ClientProtocolException, IOException{
 		APIInvoker apiInvoker = new APIInvoker();
-		apiInvoker.callAPI();
+		apiInvoker.callAPI("");
 	}
 
 }

@@ -1,24 +1,36 @@
 package com.barclays.metrics.charts;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.barclays.metrics.web.APIInvoker;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class BuildTimePieChartCreator {
+
+	private String responseData;
+
+	public BuildTimePieChartCreator(String responseData) {
+		this.responseData = responseData;
+	}
+
+	public JSONObject getData() throws JsonParseException, JsonMappingException, JSONException, IOException {
+		return getSeriesJsonFromResponse();
+	}
 
 	public JSONObject getData(String projectName) throws JSONException {
 		boolean apiCall = false;
 		if (!apiCall) {
 			return getDataFromStaticinfo(projectName);
 		}
-		
-		APIInvoker apiInvoker = new APIInvoker();
-		//apiInvoker
 		return null;
 	}
 
@@ -151,6 +163,24 @@ public class BuildTimePieChartCreator {
 			JSONObject dataJson = new JSONObject();
 			dataJson.put("name", pieceOfPie.getName());
 			dataJson.put("y", pieceOfPie.getValue());
+			dataArray.put(dataJson);
+		}
+
+		seriesJson.put("data", dataArray);
+		return seriesJson;
+	}
+
+	private JSONObject getSeriesJsonFromResponse()
+			throws JSONException, JsonParseException, JsonMappingException, IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, String> dataMap = mapper.readValue(responseData, new TypeReference<Map<String, String>>() {
+		});
+		JSONObject seriesJson = new JSONObject();
+		JSONArray dataArray = new JSONArray();
+		for (Map.Entry<String, String> entry : dataMap.entrySet()) {
+			JSONObject dataJson = new JSONObject();
+			dataJson.put("name", entry.getKey());
+			dataJson.put("y", entry.getValue());
 			dataArray.put(dataJson);
 		}
 
